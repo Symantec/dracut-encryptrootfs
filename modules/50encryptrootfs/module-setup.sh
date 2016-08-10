@@ -63,9 +63,30 @@ _lookup_implementation(){
 }
 
 install() {
-      #some initialization
+      #some initialization and validation
       [[ -z "${dropbear_port}" ]] && dropbear_port=222
       [[ -z "${dropbear_acl}" ]] && dropbear_acl=""
+      [[ -z "${encrypted_keyfile_path}" ]] && encrypted_keyfile_path="luks.key"
+      [[ -z "${decrypted_keyfile_path}" ]] && decrypted_keyfile_path="/tmp/keyfile.key"
+      [[ -z "${boot_partition_size}" ]] && boot_partition_size="200"
+      [[ -z "${boot_partition_file_system}" ]] && boot_partition_file_system="ext3"
+      [[ -z "${rootfs_partition_file_system}" ]] && rootfs_partition_file_system="ext3"
+      [[ -z "${boot_partition_label}" ]] && boot_partition_label="boot"
+      [[ -z "${key_management_implementation}" ]] && key_management_implementation="naive_keymanagement.sh"
+      [[ -z "${networking_configuration_implementation}" ]] && networking_configuration_implementation="dhcp_networking_configuration.sh"
+      [[ -z "${install_debug_deps}" ]] && install_debug_deps="false"
+      [[ -z "${debug_deps}" ]] && debug_deps=""
+
+      if [[ -z "${disk}" ]];then
+        derror "'disk' parameter should be defined in config."
+        return 1
+      fi
+
+      if [[ -z "${root_partition}" ]];then
+        derror "'root_partition' parameter should be defined in config."
+        return 1
+      fi
+
       local tmpDir=$(mktemp -d --tmpdir encryptrootfs.XXXX)
       local dropbearAcl="${tmpDir}/authorized_keys"
       echo "${dropbear_acl}" > $dropbearAcl
