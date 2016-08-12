@@ -6,8 +6,12 @@ check() {
 }
 
 depends() {
-    echo network
+    echo network crypt
     return 0
+}
+
+installkernel(){
+    hostonly='' instmods "dm-crypt"
 }
 
 _install_depencencies() {
@@ -206,4 +210,7 @@ install() {
       rm -rf $tmpDir
 
       _install_depencencies
+      #removing systemd generator as far as it performs file system check on any operation with rootfs partition
+      #more information about systemd.generator http://bit.ly/2aWWCmy
+      sed -i '/systemd-fstab-generator/d' /usr/lib/dracut/modules.d/98systemd/module-setup.sh
 }
