@@ -198,6 +198,7 @@ _encryptrootfs()
 
         _luks_format_and_open $root_partition $decrypted_keyfile_path $rootfs_partition_file_system
         _copy_rootfs_content_back
+        echo "#File marker for further processing" > /sysroot/etc/encryptrootfs-initramfs
 
     else
         _info "All partitions are already created. Just unlocking filesystem"

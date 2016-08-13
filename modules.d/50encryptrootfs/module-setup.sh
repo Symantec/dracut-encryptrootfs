@@ -33,16 +33,17 @@ _install_depencencies() {
 
 
     #debug and troubleshooting toolset
-    if [  "${install_debug_deps}" = "true" ];then
-        _install_impl_dependencies $debug_deps
+    if [  "${install_debug_deps}" == "true" ];then
+        dinfo "Installing debug dependencies '${debug_deps}'"
+        _install_impl_dependencies "${debug_deps}"
     fi
 
 }
 
 _install_impl_dependencies(){
     dependencies=$1
-    for dep in $dependencies
-    do
+    for dep in $dependencies; do
+        dinfo "Installing $dep"
         dracut_install $dep
     done
 }
@@ -188,7 +189,11 @@ install() {
       _install_impl_dependencies $networking_configuration_dependencies
       impl_path=$(_lookup_implementation $networking_configuration_implementation $moddir)
       dinfo "Network configuration implementation ${impl_path} is used"
-      inst_simple $impl_path /sbin/encryptrootfs_networking_configuration_impl.sh
+
+      #making sure that it is executable
+      cp $impl_path $tmpDir/network.sh
+      chmod 744 $tmpDir/network.sh
+      inst $tmpDir/network.sh /sbin/encryptrootfs_networking_configuration_impl.sh
 
       #installing actual keymanagement implementation
       impl_path=$(_lookup_implementation $key_management_implementation $moddir)
