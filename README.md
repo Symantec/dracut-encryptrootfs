@@ -1,6 +1,74 @@
 # dracut-encryptrootfs
+Dracut module for encryption of rootfs partition during first boot. The 
+[Cryptsetup](https://gitlab.com/cryptsetup/cryptsetup)
+[LUKS](https://en.wikipedia.org/wiki/Linux_Unified_Key_Setup)
+implementation is used for crypto. 
 
-Dracut module for encryption of rootfs during first boot.
+It is targeted to protect data with encryption for cases when physical 
+access to disk is technically possible.
+
+## Workflow
+dracut-encryptrootfs does the following to encrypt rootfs partition.
+
+1. During boot on `initramfs` aks early user space
+    1. copying all rootfs partition content to memory 
+    1. repartitioning of disk
+        1. creating, formatting, labeling `label:boot` partition
+        1. creating, formatting future rootfs partition
+    1. generating plain text LUKS key
+    1. creating and configuring LUKS volume
+    1. copying back rootfs content from memory to LUKS backed partition
+    1. encrypting LUKS key and storing it to `/boot/luks.key` location
+1. During `init` process (:exclamation: **not implemented yet**)
+    1. moving all `/boot` content to `label:boot` partition
+    1. updating GRUB configuration
+    1. updating MBR and re-installing boot loader 
+
+## Installation
+Module could be installed from git repo directly.
+
+`cp -a modules.d/* /usr/lib/dracut/modules.d/`
+`cp encryptrootfs.conf /etc/dracut.conf.d/`
+
+TODO(illia): describe systemd service installation here
+
+### Compatibility
+Module is compatible with Centos 7. It uses `GRUB`, `Cryptsetup`,
+`systemd` and expects `MBR` partitioning schema.
+
+### Key management
+The key management logic is pluggable and could be configured with
+providing corresponding bash implementation `naive_keymanagement.sh`
+could be used as example.
+
+### Networking configuration
+It is expected that LUKS key is never stored in unencrypted way on
+machine and decrypted with external key management system. So network
+connectivity is a critical dependency.
+
+Another reason for networking is ability to troubleshoot dracut for
+headless system where console or VNC is not an option (f.e. AWS EC2). 
+
+The networking configuration logic could be customized with providing 
+bash implementation. DHCP implementation
+`dhcp_networking_configuration.sh` could be used as sample.
+
+This script will be called until it returns `0` as part of dracut
+`initqueue`
+
+### AWS KMS integration
+To integrate module with AWS Key Management System 
+[simple-cloud-encrypt](https://github.com/cviecco/simple-cloud-encrypt)
+utility could be used.
+
+## Troubleshooting
+To troubleshoot boot process you can follow all standard
+[documentation](https://www.kernel.org/pub/linux/utils/boot/dracut/dracut.html#_troubleshooting)
+with the only difference when you don't have access to machine console
+you can login via ssh using RSA key configured during module 
+installation.
+
+`ssh root@VM_HOST -p 2222`, where `2222` - default port
 
 ## Contributions
 
