@@ -27,8 +27,9 @@ dracut-encryptrootfs does the following to encrypt rootfs partition.
 ## Installation
 Module could be installed from git repo directly.
 
-`cp -a modules.d/* /usr/lib/dracut/modules.d/`
-`cp encryptrootfs.conf /etc/dracut.conf.d/`
+ `cp -a modules.d/* /usr/lib/dracut/modules.d/`
+ 
+ `cp encryptrootfs.conf /etc/dracut.conf.d/`
 
 TODO(illia): describe systemd service installation here
 
@@ -38,7 +39,8 @@ Module is compatible with Centos 7. It uses `GRUB`, `Cryptsetup`,
 
 ### Key management
 The key management logic is pluggable and could be configured with
-providing corresponding bash implementation `naive_keymanagement.sh`
+providing corresponding bash implementation
+[`naive_keymanagement.sh`](../master/modules.d/50encryptrootfs/naive_keymanagement.sh)
 could be used as example.
 
 ### Networking configuration
@@ -51,7 +53,8 @@ headless system where console or VNC is not an option (f.e. AWS EC2).
 
 The networking configuration logic could be customized with providing 
 bash implementation. DHCP implementation
-`dhcp_networking_configuration.sh` could be used as sample.
+[`dhcp_networking_configuration.sh`](../master/modules.d/50encryptrootfs/dhcp_networking_configuration.sh)
+could be used as sample.
 
 This script will be called until it returns `0` as part of dracut
 `initqueue`
