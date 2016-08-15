@@ -22,7 +22,12 @@ dracut-encryptrootfs does the following to encrypt rootfs partition.
 1. During `init` process (:exclamation: **not implemented yet**)
     1. moving all `/boot` content to `label:boot` partition
     1. updating GRUB configuration
-    1. updating MBR and re-installing boot loader 
+    1. updating MBR and re-installing boot loader
+
+
+Result partition table looks like this
+
+![Disk diagram][disk_diagram]
 
 ## Installation
 Module could be installed from git repo directly.
@@ -121,3 +126,5 @@ License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for
 the specific language governing permissions and limitations under the
 License.
+
+[disk_diagram]: ../master/docs/disk_diagram.png "Disk diagram"
