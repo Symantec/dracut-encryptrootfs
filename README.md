@@ -36,13 +36,20 @@ Module could be installed from git repo directly.
 
 
 ```
+#installing dracut modules
 cp -a modules.d/* /usr/lib/dracut/modules.d/
 cp encryptrootfs.conf /etc/dracut.conf.d/
-#TODO(illia) add systemd service installation instruction
+
+#installing Systemd service
+cp init/dracut-encryptrootfs-final /usr/local/sbin/dracut-encryptrootfs-final
+cp init/systemd/encryptrootfs.service /etc/systemd/system/encryptrootfs.service
+
+chmod 664 /etc/systemd/system/encryptrootfs.service
+chmod 744 /usr/local/sbin/dracut-encryptrootfs-final
+
+systemctl daemon-reload
+systemctl enable encryptrootfs.service
 ```
-
-
-TODO(illia): describe systemd service installation here
 
 ### Compatibility
 Module is compatible with Centos 7. It uses `GRUB`, `Cryptsetup`,
