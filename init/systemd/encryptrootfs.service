@@ -1,0 +1,12 @@
+[Unit]
+Description=dracut-encryptrootfs final modifications service
+Documentation=https://github.com/Symantec/dracut-encryptrootfs
+Requires=basic.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/dracut-encryptrootfs-final
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

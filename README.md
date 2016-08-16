@@ -19,10 +19,12 @@ dracut-encryptrootfs does the following to encrypt rootfs partition.
     1. creating and configuring LUKS volume
     1. copying back rootfs content from memory to LUKS backed partition
     1. encrypting LUKS key and storing it to `/boot/luks.key` location
-1. During `init` process (:exclamation: **not implemented yet**)
-    1. moving all `/boot` content to `label:boot` partition
+1. During `init` process
+    1. moving all `/boot` content to `label:boot` partition where 
+        `/boot/luks.key` is already located
+    1. updating `/etc/fstab`
     1. updating GRUB configuration
-    1. updating MBR and re-installing boot loader
+    1. updating MBR with re-installing boot loader
 
 
 Result partition table looks like this
@@ -32,9 +34,13 @@ Result partition table looks like this
 ## Installation
 Module could be installed from git repo directly.
 
- `cp -a modules.d/* /usr/lib/dracut/modules.d/`
- 
- `cp encryptrootfs.conf /etc/dracut.conf.d/`
+
+```
+cp -a modules.d/* /usr/lib/dracut/modules.d/
+cp encryptrootfs.conf /etc/dracut.conf.d/
+#TODO(illia) add systemd service installation instruction
+```
+
 
 TODO(illia): describe systemd service installation here
 

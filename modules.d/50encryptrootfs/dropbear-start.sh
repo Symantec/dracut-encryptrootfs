@@ -10,7 +10,7 @@ _info() {
 }
 
 _warning() {
-    warning "$*"
+    warn "$*"
     _write_log $*
 }
 

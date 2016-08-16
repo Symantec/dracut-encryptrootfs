@@ -10,7 +10,7 @@ _info() {
 }
 
 _warning() {
-    warning "$*"
+    warn "$*"
 }
 
 _resize_partition(){
@@ -119,6 +119,7 @@ _init_key(){
     _check_errors
     key_management_encrypt_key_file $decrypted_keyfile_path $boot_mount/$encrypted_keyfile_path
     _check_errors
+    umount $boot_mount
 }
 
 _luks_format_and_open(){
