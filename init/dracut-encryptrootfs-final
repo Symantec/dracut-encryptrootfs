@@ -21,6 +21,8 @@ then
 
     mv /boot/ /boot_
     mkdir /boot
+
+    #adding new mount point for boot partition
     if [[ -z $(grep "/boot" "/etc/fstab") ]] ; then
         echo "LABEL=${boot_partition_label}    /boot  ${boot_partition_file_system}    defaults        1 1" >> /etc/fstab
     fi
@@ -30,31 +32,16 @@ then
     cp -a /boot_/* /boot/
     rm -rf /boot_/
 
-    boot_opts=""
+    #avoiding lookup rootfs partition by UUID
+    sed -i '/GRUB_DISABLE_LINUX_UUID/d' /etc/default/grub
+    echo "GRUB_DISABLE_LINUX_UUID=\"true\"" >> /etc/default/grub
 
-    #TODO(illia) minimize GRUB config changes
-    #networking
-    boot_opts=$boot_opts" rd.neednet=1 ip=dhcp rd.net.dhcp.retry=5 rd.net.timeout.dhcp=60"
+    #avoiding device autodetection by GRUB
+    sed -i '/GRUB_DEVICE/d' /etc/default/grub
+    echo "GRUB_DEVICE=\"${disk}\"" >> /etc/default/grub
 
-    #debug brakepoint
-    #boot_opts=$boot_opts" rd.break=pre-mount"
 
-    #debug options
-    boot_opts=$boot_opts" rd.shell rd.debug log_buf_len=1M"
-
-    cat > /etc/default/grub << EOM
-GRUB_TIMEOUT=5
-GRUB_DISTRIBUTOR="\$(sed 's, release .*\$,,g' /etc/system-release)"
-GRUB_DEFAULT=saved
-GRUB_DISABLE_SUBMENU=true
-GRUB_TERMINAL_OUTPUT="console"
-GRUB_CMDLINE_LINUX="ttyS0,115200n8 console=tty0 vconsole.font=latarcyrheb-sun16 vconsole.keymap=us biosdevname=0 plymouth.enable=0 crashkernel=auto ${boot_opts}"
-GRUB_DISABLE_RECOVERY="false"
-GRUB_DISABLE_LINUX_UUID="true"
-GRUB_DEVICE="/dev/sda1"
-EOM
-
-    #grub manipulation are here
+    #generating new grub config
     grub2-mkconfig -o /boot/grub2/grub.cfg
     _check_errors "generating new grub config"
     grub2-install ${disk}
