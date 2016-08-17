@@ -103,6 +103,8 @@ _check_errors(){
    if [[ $? -gt 0 ]]
    then
         _warning "Return code is not 0 but '$?'"
+        #sleeping some time to make sure we are able to see where error happened
+        sleep ${pause_on_error}
         exit 1
    fi
 }

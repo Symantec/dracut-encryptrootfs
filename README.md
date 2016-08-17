@@ -33,12 +33,35 @@ Result partition table looks like this
 
 ## Installation
 Module could be installed from git repo directly.
+Here is a sample for AWS instance.
+Make sure that all filesystem content fits into `/dev/shm`. t2.large is 
+sufficient for ~2GB of image content.
 
 
-```
+```bash
+#!/usr/bin/env bash
+git clone https://github.com/zaletniy/dracut-encryptrootfs.git
+cd dracut-encryptrootfs
+
+yum -y install dropbear cryptsetup
+
 #installing dracut modules
 cp -a modules.d/* /usr/lib/dracut/modules.d/
 cp encryptrootfs.conf /etc/dracut.conf.d/
+
+#adding public key to config
+echo "dropbear_acl=\"ssh-rsa AAAABPAR...e user\"" >> /etc/dracut.conf.d/encryptrootfs.conf
+echo "disk=/dev/xvda" >> /etc/dracut.conf.d/encryptrootfs.conf
+echo "root_partition=/dev/xvda1" >> /etc/dracut.conf.d/encryptrootfs.conf
+echo "install_debug_deps=true" >> /etc/dracut.conf.d/encryptrootfs.conf
+echo "debug_deps=\"blockdev e2fsck partx partprobe resize2fs tune2fs lsmod env df du md5sum chmod\"" >> /etc/dracut.conf.d/encryptrootfs.conf
+
+#useful for AWS EC2 to update /usr/lib/modules/$(uname -r)/modules.dep
+#if image was imported to EC2
+depmod -a
+
+#rebuilding of initramfs
+dracut -f -v
 
 #installing Systemd service
 cp init/dracut-encryptrootfs-final /usr/local/sbin/dracut-encryptrootfs-final
@@ -49,6 +72,23 @@ chmod 744 /usr/local/sbin/dracut-encryptrootfs-final
 
 systemctl daemon-reload
 systemctl enable encryptrootfs.service
+
+sed -i '/GRUB_CMDLINE_LINUX/d' /etc/default/grub
+echo "GRUB_CMDLINE_LINUX=\"ttyS0,115200n8 console=tty0 vconsole.font=latarcyrheb-sun16 vconsole.keymap=us biosdevname=0 plymouth.enable=0 crashkernel=auto rd.neednet=1 ip=dhcp rd.net.dhcp.retry=5 rd.net.timeout.dhcp=60 rd.shell rd.debug log_buf_len=1M\"
+" >> /etc/default/grub
+
+sed -i '/GRUB_TIMEOUT/d' /etc/default/grub
+echo "GRUB_TIMEOUT=5" >> /etc/default/grub
+
+#debug output
+cat /etc/default/grub
+
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+#debug output
+blkid
+
+reboot
 ```
 
 ### Compatibility
