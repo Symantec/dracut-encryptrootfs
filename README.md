@@ -38,7 +38,7 @@ Make sure that all filesystem content fits into `/dev/shm`. t2.large is
 sufficient for ~2GB of image content.
 
 
-```
+```bash
 #!/usr/bin/env bash
 git clone https://github.com/zaletniy/dracut-encryptrootfs.git
 cd dracut-encryptrootfs
