@@ -55,7 +55,7 @@ _create_boot_partition(){
     boot_partition_sized_in_mb=$2
     fs_type=$3
 
-    disk_size_in_mb_output=$(/sbin/parted $disk_name print)
+    disk_size_in_mb_output=$(/sbin/parted $disk_name unit mb print)
     _check_errors
     disk_size_in_mb=$(echo "${disk_size_in_mb_output}" | grep -e "Disk $disk_name" | awk '{print $3}' | grep -o -e "[0-9]*")
     _check_errors
