@@ -214,6 +214,11 @@ install() {
       dinfo "authorized_keys: ${dropbear_acl}"
       inst "${dropbearAcl}" /root/.ssh/authorized_keys
 
+      #TLS certificates
+      dinfo "Installing TLS certificates"
+      inst /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+      inst /etc/pki/tls/certs/ca-bundle.crt /etc/pki/tls/certs/ca-bundle.crt
+
       #cleanup
       rm -rf $tmpDir
 

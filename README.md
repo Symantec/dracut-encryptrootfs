@@ -34,7 +34,7 @@ Result partition table looks like this
 ## Installation
 Module could be installed from git repo directly.
 Here is a sample for AWS instance.
-Make sure that all filesystem content fits into `/dev/shm`. t2.large is 
+Make sure that all filesystem content fits in available memory. m3.medium is 
 sufficient for ~2GB of image content.
 
 

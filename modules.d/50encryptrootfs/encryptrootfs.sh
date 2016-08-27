@@ -55,7 +55,7 @@ _create_boot_partition(){
     boot_partition_sized_in_mb=$2
     fs_type=$3
 
-    disk_size_in_mb_output=$(/sbin/parted $disk_name print)
+    disk_size_in_mb_output=$(/sbin/parted $disk_name unit mb print)
     _check_errors
     disk_size_in_mb=$(echo "${disk_size_in_mb_output}" | grep -e "Disk $disk_name" | awk '{print $3}' | grep -o -e "[0-9]*")
     _check_errors
@@ -94,6 +94,28 @@ _copy_rootfs_content(){
     root_partition=$1
     mount $root_partition /sysroot/
     _check_errors
+
+    content_size_of_rootfs_kb=$(df -B K | grep /sysroot | awk '{print $3}' | grep -o -e "[0-9]*")
+    _check_errors
+    shm_size_kb=$(df -B K | grep /dev/shm | awk '{print $2}' | grep -o -e "[0-9]*")
+    _check_errors
+    free_memory=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')
+
+    if [ "$content_size_of_rootfs_kb" -gt "$free_memory" ]; then
+        _warning "Filesystem content (${content_size_of_rootfs_kb}KB) is bigger that available (${free_memory}KB) memory. Couldn't perform encryption."$enc_file
+        sleep ${pause_on_error}
+        exit 1
+    fi
+
+    if [ "$content_size_of_rootfs_kb" -gt "$shm_size_kb" ]; then
+        _info "Remounting /dev/shm with bigger size"
+        umount /dev/shm
+        _check_errors "umount /dev/shm"
+        mount -t tmpfs -o size=${content_size_of_rootfs_kb}K,nosuid,nodev,rw,strictatime tmpfs /dev/shm/
+        _check_errors "mount -t tmpfs -o size=${content_size_of_rootfs_kb}K,nosuid,nodev,rw,strictatime tmpfs /dev/shm/"
+        dev_shm_remounted="true"
+    fi
+
     cp -a /sysroot/ /dev/shm/sysroot/
     _check_errors
     umount $root_partition
@@ -102,7 +124,7 @@ _copy_rootfs_content(){
 _check_errors(){
    if [[ $? -gt 0 ]]
    then
-        _warning "Return code is not 0 but '$?'"
+        _warning "Return code is not 0 but '$?'. For operation ${1}"
         #sleeping some time to make sure we are able to see where error happened
         sleep ${pause_on_error}
         exit 1
@@ -159,6 +181,7 @@ _decrypt_keyfile()
         _check_errors
      else
         _warning "Can't find file "$enc_file
+        sleep ${pause_on_error}
         exit 1
      fi
 
@@ -182,6 +205,13 @@ _luks_open(){
 _copy_rootfs_content_back(){
     cp -a /dev/shm/sysroot/* /sysroot
     rm -rf /dev/shm/sysroot/
+    if [[ -n "$dev_shm_remounted" ]]; then
+        _info "Returning /dev/shm to original size"
+        umount /dev/shm
+        _check_errors "umount /dev/shm"
+        mount -t tmpfs -o size=${shm_size_kb}K,nosuid,nodev,rw,strictatime tmpfs /dev/shm/
+        _check_errors "mount -t tmpfs -o size=${content_size_of_rootfs_kb}K,nosuid,nodev,rw,strictatime tmpfs /dev/shm/"
+    fi
 }
 
 _encryptrootfs()
