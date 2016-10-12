@@ -9,6 +9,7 @@ PATH=/usr/bin:/bin:/sbin
 
 . /lib/dracut-lib.sh
 
+mkdir -p  /var/lib/dhclient
 ip=$(ip addr | grep "inet " | grep -v "127.")
 if [ -z "$ip" ]
 then
