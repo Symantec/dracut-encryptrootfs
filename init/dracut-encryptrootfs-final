@@ -74,7 +74,7 @@ _check_linux_distrub(){
             OSRELEASE="$(lsb_release -s -c)"
         fi
     elif [ -f /etc/redhat-release ] ; then
-        OSRELEASE="$(awk '{print $4}' /etc/redhat-release | sed -e 's/\..*//')"
+        OSRELEASE="$(grep -o -e "[0-9]" /etc/redhat-release | head -n 1)"
         OS="$(awk '{print tolower($1)}' /etc/redhat-release)"
     fi
 
