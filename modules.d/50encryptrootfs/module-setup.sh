@@ -69,7 +69,7 @@ _lookup_implementation(){
 
 _check_linux_distrub(){
     if [ -x /usr/bin/lsb_release ] ; then
-        OS="$(lsb_release -s -i | tr '[:lower:]' '[:upper:]')"
+        OS="$(lsb_release -s -i | tr '[:upper:]' '[:lower:]')"
         if [ "$OS" = "centos" ] ; then
             OSRELEASE="$(lsb_release -s -r | sed -e 's/\..*//')"
         else
