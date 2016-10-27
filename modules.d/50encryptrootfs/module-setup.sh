@@ -76,7 +76,7 @@ _check_linux_distrub(){
             OSRELEASE="$(lsb_release -s -c)"
         fi
     elif [ -f /etc/redhat-release ] ; then
-        OSRELEASE="$(awk '{print $3}' /etc/redhat-release | sed -e 's/\..*//')"
+        OSRELEASE="$(awk '{print $4}' /etc/redhat-release | sed -e 's/\..*//')"
         OS="$(awk '{print tolower($1)}' /etc/redhat-release)"
     fi
 
@@ -176,7 +176,7 @@ install() {
       _install_impl_dependencies "$key_management_deps"
       inst_simple "$impl_path" /sbin/encryptrootfs_key_management_impl.sh
 
-      inst_hook cmdline 20 "$moddir/encryptrootfs-init.sh"
+      inst_hook cmdline 20 "$moddir/encryptrootfs-init-$OS$OSRELEASE.sh"
       inst_hook pre-mount 01 "$moddir/dropbear-start.sh"
       inst_hook pre-mount 99 "$moddir/encryptrootfs.sh"
 
