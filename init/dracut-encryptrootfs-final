@@ -67,7 +67,7 @@ _mount_boot_centos7(){
 }
 _check_linux_distrub(){
     if [ -x /usr/bin/lsb_release ] ; then
-        OS="$(lsb_release -s -i | tr '[:upper:]' '[:lowe:]')"
+        OS="$(lsb_release -s -i | tr '[:upper:]' '[:lower:]')"
         if [ "$OS" = "centos" ] ; then
             OSRELEASE="$(lsb_release -s -r | sed -e 's/\..*//')"
         else
