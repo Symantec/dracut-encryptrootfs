@@ -78,6 +78,10 @@ _create_boot_partition(){
     _check_errors
     _info "Result ${out}"
 
+    _info "Rereading partitions with sfdisk -R"
+    out=$(/sbin/sfdisk -R "$disk_name")
+    _check_errors "Rereading partitions ${out}"
+
     _info "Creating filesystem on boot partition mkfs.ext3 ${disk_name}2"
     out=$(mkfs."$fs_type" "$disk_name"2)
     _check_errors
@@ -85,7 +89,7 @@ _create_boot_partition(){
 
     _info "Setting boot label e2label ${disk_name}2 boot"
     out=$(/sbin/e2label "$disk_name"2 boot)
-    _check_errors
+    _check_errors "/sbin/e2label ${disk_name}2 boot"
     _info "Result ${out}"
 }
 
