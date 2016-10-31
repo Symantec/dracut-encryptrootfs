@@ -13,7 +13,7 @@ mkdir -p  /var/lib/dhclient
 ip=$(ip addr | grep "inet " | grep -v "127.")
 if [ -z "$ip" ]
 then
-    dhclient -v -timeout 10
+    dhclient -v -timeout 60
     exit 1
 else
     exit 0
