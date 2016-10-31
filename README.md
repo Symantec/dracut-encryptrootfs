@@ -56,6 +56,7 @@ echo "dropbear_acl=\"ssh-rsa AAAABPAR...e user\"" >> /etc/dracut.conf.d/encryptr
 echo "disk=xvda" >> /etc/dracut.conf.d/encryptrootfs.conf
 echo "root_partition=xvda1" >> /etc/dracut.conf.d/encryptrootfs.conf
 echo "install_debug_deps=true" >> /etc/dracut.conf.d/encryptrootfs.conf
+echo "networking_configuration_implementation="dhcp_networking_configuration_centos7.sh"
 echo "debug_deps=\"blockdev e2fsck partx partprobe resize2fs tune2fs lsmod env df du md5sum chmod\"" >> /etc/dracut.conf.d/encryptrootfs.conf
 
 #useful for AWS EC2 to update /usr/lib/modules/$(uname -r)/modules.dep

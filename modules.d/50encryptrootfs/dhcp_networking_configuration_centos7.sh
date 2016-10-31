@@ -1,5 +1,5 @@
 #!/bin/sh
-#
+# Centos 7
 # DHCP networking configuration
 #
 # should perform configuration or exit with > 0 return code

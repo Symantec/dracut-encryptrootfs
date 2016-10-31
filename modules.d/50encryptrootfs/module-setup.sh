@@ -100,11 +100,14 @@ install() {
       [ -z "${rootfs_partition_file_system}" ] && rootfs_partition_file_system="ext3"
       [ -z "${boot_partition_label}" ] && boot_partition_label="boot"
       [ -z "${key_management_implementation}" ] && key_management_implementation="naive_keymanagement.sh"
-      [ -z "${networking_configuration_implementation}" ] && networking_configuration_implementation="dhcp_networking_configuration.sh"
       [ -z "${pause_on_error}" ] && pause_on_error=10
       [ -z "${install_debug_deps}" ] && install_debug_deps="false"
       [ -z "${debug_deps}" ] && debug_deps=""
 
+      if [ -z "${networking_configuration_implementation}" ];then
+        derror "'networking_configuration_implementation' parameter should be defined in config."
+        return 1
+      fi
 
       if [ -z "${disk}" ];then
         derror "'disk' parameter should be defined in config."
