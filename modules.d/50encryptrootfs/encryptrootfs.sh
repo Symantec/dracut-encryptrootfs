@@ -140,14 +140,15 @@ _init_key(){
     mkdir "$boot_mount"
 
     boot_partition=$(blkid -L "$boot_partition_label")
-    _check_errors
+    _check_errors "blkid -L $boot_partition_label"
     mount "$boot_partition" "$boot_mount"
-    _check_errors
+    _check_errors "mount $boot_partition $boot_mount"
     key_management_generate_key_file "$decrypted_keyfile_path"
-    _check_errors
+    _check_errors "key_management_generate_key_file $decrypted_keyfile_path"
     key_management_encrypt_key_file "$decrypted_keyfile_path" "$boot_mount"/"$encrypted_keyfile_path"
-    _check_errors
+    _check_errors "key_management_encrypt_key_file $decrypted_keyfile_path ${boot_mount}/${encrypted_keyfile_pat}"
     umount "$boot_mount"
+    _check_errors "umount $boot_mount"
 }
 
 _luks_format_and_open(){
@@ -156,17 +157,17 @@ _luks_format_and_open(){
     rootfs_partition_file_system=$3
 
     /sbin/cryptsetup -v -q luksFormat "$root_partition" "$decrypted_keyfile_path"
-    _check_errors
+    _check_errors "/sbin/cryptsetup -v -q luksFormat $root_partition $decrypted_keyfile_path"
 
     /sbin/cryptsetup --debug luksOpen "$root_partition" rootfs --key-file "$decrypted_keyfile_path"
-    _check_errors
+    _check_errors "/sbin/cryptsetup --debug luksOpen $root_partition rootfs --key-file $decrypted_keyfile_path"
 
     /sbin/mkfs."$rootfs_partition_file_system" /dev/mapper/rootfs
-    _check_errors
+    _check_errors "/sbin/mkfs.$rootfs_partition_file_system /dev/mapper/rootfs"
 
     mkdir /sysroot
     mount -t "$rootfs_partition_file_system" /dev/mapper/rootfs /sysroot/
-    _check_errors
+    _check_errors "mount -t $rootfs_partition_file_system /dev/mapper/rootfs /sysroot/"
 }
 
 _decrypt_keyfile()
@@ -174,9 +175,9 @@ _decrypt_keyfile()
      mount_path="/tmp/boot"
      mkdir $mount_path
      boot_partition=$(blkid -L "$boot_partition_label")
-     _check_errors
+     _check_errors "blkid -L $boot_partition_label)"
      mount "$boot_partition" "$mount_path"
-     _check_errors
+     _check_errors "mount $boot_partition $mount_path"
 
      enc_file="$mount_path"/"$encrypted_keyfile_path"
 
@@ -190,7 +191,7 @@ _decrypt_keyfile()
      fi
 
      umount $mount_path
-     _check_errors
+     _check_errors "umount $mount_path"
      _info "Key file was decrypted and stored to $decrypted_keyfile_path"
 }
 
