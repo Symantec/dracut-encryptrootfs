@@ -6,12 +6,32 @@ check() {
 }
 
 depends() {
-    echo network crypt
+    echo crypt
     return 0
 }
 
+net_module_test() {
+    local net_drivers='eth_type_trans|register_virtio_device'
+    local unwanted_drivers='/(wireless|isdn|uwb)/'
+    egrep -q $net_drivers "$1" && \
+	egrep -qv 'iw_handler_get_spy' "$1" && \
+	[[ ! $1 =~ $unwanted_drivers ]]
+}
+
 installkernel(){
-    hostonly='' instmods "dm-crypt"
+
+    instmods $(filter_kernel_modules net_module_test)
+
+    instmods ecb arc4
+    # bridge modules
+    instmods bridge stp llc
+    instmods ipv6
+    # vlan
+    instmods 8021q
+    # bonding
+    instmods bonding
+    # hyperv
+    hostonly='' instmods "dm-crypt hv_netvsc"
 }
 
 _install_depencencies() {
@@ -191,16 +211,35 @@ install() {
       inst /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
       inst /etc/pki/tls/certs/ca-bundle.crt /etc/pki/tls/certs/ca-bundle.crt
 
-      #cleanup
-      rm -rf "$tmpDir"
-
-      _install_depencencies
-
       if [  "$OS$OSRELEASE" = "centos7" ];then
         #removing systemd generator as far as it performs file system check on any operation with rootfs partition
         #more information about systemd.generator http://bit.ly/2aWWCmy
         sed -i '/systemd-fstab-generator/d' /usr/lib/dracut/modules.d/98systemd/module-setup.sh
         sed -i '/dracut-rootfs-generator/d' /usr/lib/dracut/modules.d/98systemd/module-setup.sh
+      else
+
+          #DNS dependencies for networking
+          if ldd $(which sh) 2>/dev/null | grep -q lib64; then
+             LIBDIR="/lib64"
+          else
+             LIBDIR="/lib"
+          fi
+
+          ARCH=$(uname -m)
+
+          for dir in /usr/$LIBDIR/tls/$ARCH/ /usr/$LIBDIR/tls/ /usr/$LIBDIR/$ARCH/ /usr/$LIBDIR/ /$LIBDIR/; do
+            for i in $(ls $dir/libnss_dns.so.* $dir/libnss_mdns4_minimal.so.* 2>/dev/null); do
+                dracut_install $i
+            done
+          done
+
+          cp "$moddir/dhclient-script-centos-6.sh" "$tmpDir/dhclient-script"
+          chmod 744 "$tmpDir/dhclient-script"
+          inst "$tmpDir/dhclient-script" /sbin/dhclient-script-encryptrootfs
       fi
 
+        #cleanup
+      rm -rf "$tmpDir"
+
+      _install_depencencies
 }
