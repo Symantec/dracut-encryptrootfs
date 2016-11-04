@@ -31,6 +31,10 @@ _update_grub_config_centos6(){
     sed -i -e "s@\(^\s*kernel.*\)\(root=UUID=[0-9a-f-]*\)@\1root=/dev/${disk}2@" /boot/grub/grub.conf
     sed -i -e "s@\(^\s*root\s\)(.*)@\1(hd0,1)@" /boot/grub/grub.conf
     sed -i -e "s@\(^\s*splashimage=\)(.*)@\1(hd0,1)@" /boot/grub/grub.conf
+
+    # Updating device mapping
+    # (hd0)     /dev/vda -> (hd0)     /dev/xvda
+    sed -i -e "s@\(^(hd0)\s*\)\(\\/.*$\)@\1/dev/${disk}@" /boot/grub/device.map
     _check_errors "Updating /boot/grub/grub.conf"
 }
 
