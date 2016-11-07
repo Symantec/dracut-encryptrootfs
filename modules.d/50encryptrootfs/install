@@ -3,4 +3,4 @@
 . /usr/share/dracut/dracut-functions
 . "$moddir"/module-setup.sh
 
-installkernel "$@"
+install "$@"

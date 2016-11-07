@@ -2,6 +2,6 @@
 
 . /etc/dracut.conf.d/encryptrootfs.conf
 . /usr/share/dracut/dracut-functions
-. $moddir/module-setup.sh
+. "$moddir/module-setup.sh"
 
-install $@
+installkernel $@

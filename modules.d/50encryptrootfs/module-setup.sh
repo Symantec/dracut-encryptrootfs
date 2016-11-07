@@ -19,19 +19,25 @@ net_module_test() {
 }
 
 installkernel(){
+    _check_linux_distrub
 
-    instmods $(filter_kernel_modules net_module_test)
+    if [  "$OS$OSRELEASE" = "centos7" ];then
+        hostonly='' instmods "dm-crypt"
+      else
+        instmods $(filter_kernel_modules net_module_test)
+        instmods ecb arc4
+        # bridge modules
+        instmods bridge stp llc
+        instmods ipv6
+        # vlan
+        instmods 8021q
+        # bonding
+        instmods bonding
+        # hyperv
+        hostonly='' instmods "dm-crypt hv_netvsc"
+    fi
 
-    instmods ecb arc4
-    # bridge modules
-    instmods bridge stp llc
-    instmods ipv6
-    # vlan
-    instmods 8021q
-    # bonding
-    instmods bonding
-    # hyperv
-    hostonly='' instmods "dm-crypt hv_netvsc"
+
 }
 
 _install_depencencies() {
