@@ -1,0 +1,6 @@
+#!/bin/sh
+. /etc/dracut.conf.d/encryptrootfs.conf
+. /usr/share/dracut/dracut-functions
+. "$moddir"/module-setup.sh
+
+install "$@"

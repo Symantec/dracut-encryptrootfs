@@ -33,13 +33,15 @@ Result partition table looks like this
 
 ## Installation
 Module could be installed from git repo directly.
-Here is a sample for AWS instance.
+Here is a sample for AWS instance (Centos 7).
 Make sure that all filesystem content fits in available memory. m3.medium is 
 sufficient for ~2GB of image content.
 
 
 ```bash
 #!/usr/bin/env bash
+
+# Sample configuration for Centos 7
 git clone https://github.com/zaletniy/dracut-encryptrootfs.git
 cd dracut-encryptrootfs
 
@@ -51,9 +53,10 @@ cp encryptrootfs.conf /etc/dracut.conf.d/
 
 #adding public key to config
 echo "dropbear_acl=\"ssh-rsa AAAABPAR...e user\"" >> /etc/dracut.conf.d/encryptrootfs.conf
-echo "disk=/dev/xvda" >> /etc/dracut.conf.d/encryptrootfs.conf
-echo "root_partition=/dev/xvda1" >> /etc/dracut.conf.d/encryptrootfs.conf
+echo "disk=xvda" >> /etc/dracut.conf.d/encryptrootfs.conf
+echo "root_partition=xvda1" >> /etc/dracut.conf.d/encryptrootfs.conf
 echo "install_debug_deps=true" >> /etc/dracut.conf.d/encryptrootfs.conf
+echo "networking_configuration_implementation="dhcp_networking_configuration_centos7.sh"
 echo "debug_deps=\"blockdev e2fsck partx partprobe resize2fs tune2fs lsmod env df du md5sum chmod\"" >> /etc/dracut.conf.d/encryptrootfs.conf
 
 #useful for AWS EC2 to update /usr/lib/modules/$(uname -r)/modules.dep
@@ -92,7 +95,7 @@ reboot
 ```
 
 ### Compatibility
-Module is compatible with Centos 7. It uses `GRUB`, `Cryptsetup`,
+Module is compatible with Centos 7 and Centos 6. It uses `GRUB`, `Cryptsetup`,
 `systemd` and expects `MBR` partitioning schema.
 
 ### Key management
