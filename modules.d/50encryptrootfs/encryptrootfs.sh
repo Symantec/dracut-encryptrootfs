@@ -78,9 +78,11 @@ _create_boot_partition(){
     _check_errors
     _info "Result ${out}"
 
-    _info "Rereading partitions with sfdisk -R"
-    out=$(/sbin/sfdisk -R "$disk_name")
-    _check_errors "Rereading partitions ${out}"
+    if [  "$reread_partition_table" = "true" ];then
+        _info "Rereading partitions with sfdisk -R"
+        out=$(/sbin/sfdisk -R "$disk_name")
+        _check_errors "Rereading partitions ${out}"
+    fi
 
     _info "Creating filesystem on boot partition mkfs.ext3 ${disk_name}2"
     out=$(mkfs."$fs_type" "$disk_name"2)
